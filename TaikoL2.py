@@ -34,8 +34,8 @@ def change_contract_state(account):
         'value': value
     })
     signed_txn = w3.eth.account.sign_transaction(transaction, private_key=account.key)
-    txn_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    return txn_hash
+    txn = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    return txn
 
 txt = 'privates.txt'
 with open(txt, 'r', encoding = 'utf-8') as keys_file:
