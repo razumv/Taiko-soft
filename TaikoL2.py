@@ -1,7 +1,9 @@
 from web3 import Web3, Account
 import json
+import random
+import time
 
-rpc_eth = 'https://eth-sepolia-public.unifra.io'
+rpc_eth = 'https://eth-sepolia.public.blastapi.io'
 w3 = Web3(Web3.HTTPProvider(rpc_eth))
 w3.eth.account.enable_unaudited_hdwallet_features()
 
@@ -10,25 +12,28 @@ ERC20_ABI = json.loads('''[{"inputs":[],"name":"B_CANNOT_RECEIVE","type":"error"
 eth_contract_addressd = '0x7D992599E1B8b4508Ba6E2Ba97893b4C36C23A28'
 eth_contract_address = Web3.to_checksum_address(eth_contract_addressd)
 eth_contract = w3.eth.contract(eth_contract_address, abi=ERC20_ABI)
-#https://t.me/malinmakin
-#https://t.me/malinmakin
-#https://t.me/malinmakin
-#https://t.me/malinmakin
-#https://t.me/malinmakin
 CHAIN_ID = w3.eth.chain_id
-GAS_AMOUNT = 117238
-value = 4350000000900000
 
+def random_sleep():
+    interval = random.randint(30, 50)
+    time.sleep(interval)
 
 def change_contract_state(account):
     address = account.address
-    test = tuple([1, address, 11155111, 167005, address, address, address, 3000000000000000, 0, 1350000000900000, 140000, '0x', ''])
+
+    # Generate random values
+    rand_value1 = random.randint(5000000000000000, 70000000000000000)
+    rand_value2 = random.randint(1300000000900000, 1390000000900000)
+    value = rand_value1 + rand_value2
+
+    test = tuple([1, address, 11155111, 167005, address, address, address, rand_value1, 0, rand_value2, 140000, '0x', ''])
     nonce = w3.eth.get_transaction_count(address)
+    GAS_AMOUNT = random.randint(100000, 200000)
 
     transaction = eth_contract.functions.sendMessage(test).build_transaction({
         'chainId': CHAIN_ID,
         'gas': GAS_AMOUNT,
-        'gasPrice': w3.eth.gas_price,
+        # 'gasPrice': w3.eth.gas_price,
         'from': address,
         'nonce': nonce,
         'value': value
@@ -36,10 +41,12 @@ def change_contract_state(account):
     signed_txn = w3.eth.account.sign_transaction(transaction, private_key=account.key)
     txn = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
     return txn
+    
 
 txt = 'privates.txt'
 with open(txt, 'r', encoding = 'utf-8') as keys_file:
     accounts = [Account.from_key(line.replace("\n", "")) for line in keys_file.readlines()]
     for account in accounts:
+        random_sleep()
         txn = change_contract_state(account)
         print(f'https://sepolia.etherscan.io/tx/{txn.hex()}')
